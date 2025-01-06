@@ -1,165 +1,170 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:myapp/app/controllers/auth_controller.dart';
 import 'package:myapp/app/modules/chatai/views/chatai_view.dart';
 import 'package:myapp/app/modules/dosen/views/dosen_add_view.dart';
 import 'package:myapp/app/modules/dosen/views/dosen_view.dart';
-import 'package:myapp/app/modules/mahasiswa/bindings/mahasiswa_binding.dart';
-import 'package:myapp/app/modules/mahasiswa/views/mahasiswa_add_view.dart';
 import 'package:myapp/app/modules/mahasiswa/views/mahasiswa_view.dart';
-import 'package:myapp/app/modules/pegawai/views/pegawai_add_view.dart';
 import 'package:myapp/app/modules/pegawai/views/pegawai_view.dart';
-import '../controllers/home_controller.dart';
 
-class HomeView extends GetView<HomeController> {
-  final cAuth = Get.lazyPut(() => AuthController());
-  @override
-  Widget build(BuildContext context) {
-    return DashboardAdmin();
-  }
-}
-
-class DashboardAdmin extends StatefulWidget {
-  const DashboardAdmin({super.key});
+class HomeView extends StatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
 
   @override
-  State<DashboardAdmin> createState() => _DashboardAdminState();
+  _HomeViewState createState() => _HomeViewState();
 }
 
-class _DashboardAdminState extends State<DashboardAdmin> {
-  final cAuth = Get.find<AuthController>();
-  int _index = 0;
-    List<Map> _fragment = [
-    {
-      'title': 'Dashboard',
-      'view': ChataiView()
-    },
-    {
-      'title': 'Data Mahasiswa',
-      'view': ChataiView()
-    },
-    {
-      'title': 'Data Dosen',
-      'view': DosenView(),
-      'add': () => DosenAddView()
-    },
-    {
-      'title': 'Data Karyawan',
-      'view': PegawaiView(),
-      'add': () => PegawaiAddView()},
+class _HomeViewState extends State<HomeView>
+    with SingleTickerProviderStateMixin {
+  final cAuth = Get.put(AuthController());
+  late TabController _tabController;
+  int _currentIndex = 0;
+
+  final List<Map<String, dynamic>> _tabs = [
+    {'title': 'Dashboard', 'icon': Icons.dashboard, 'view': ChataiView()},
+    {'title': 'Mahasiswa', 'icon': Icons.people, 'view': MahasiswaView()},
+    {'title': 'Dosen', 'icon': Icons.school, 'view': DosenView()},
+    {'title': 'Pegawai', 'icon': Icons.work, 'view': PegawaiView()},
   ];
 
-    @override
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _tabs.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: drawer(),
+      drawer: _buildDrawer(),
       appBar: AppBar(
-        backgroundColor: Colors.orange,
-        titleSpacing: 0,
-        title: Text(_fragment[_index]['title']),
+        backgroundColor: Color(0xFF74B3CE), // Warna biru pastel
+        title: Text(
+          _tabs[_currentIndex]['title'],
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           IconButton(
-            onPressed: () => Get.to(_fragment[_index]['add']),
             icon: Icon(Icons.add_circle_outline),
-          )
+            onPressed: () {
+              // Menambahkan data sesuai tab aktif
+              if (_currentIndex == 2) Get.to(() => DosenAddView());
+              if (_currentIndex == 3) Get.to(() => PegawaiView());
+            },
+          ),
         ],
       ),
-      body: _fragment[_index]['view'],
+      body: TabBarView(
+        controller: _tabController,
+        children: _tabs.map((tab) => tab['view'] as Widget).toList(),
+      ),
+      bottomNavigationBar: TabBar(
+        controller: _tabController,
+        indicatorColor: Colors.white,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        tabs: _tabs
+            .map((tab) => Tab(
+                  text: tab['title'],
+                  icon: Icon(tab['icon']),
+                ))
+            .toList(),
+      ),
     );
   }
 
-  Widget drawer() {
+  Widget _buildDrawer() {
     return Drawer(
       child: ListView(
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: Color(0xFF74B3CE),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Icon(
-                  Icons.account_circle,
-                  size: 80,
-                  color: Colors.white,
-                ),
+                Icon(Icons.account_circle, size: 70, color: Colors.white),
+                SizedBox(height: 10),
                 Text(
                   "Julius John Christian",
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                SizedBox(
-                  height: 2,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
                 Text(
-                  'Admin',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
+                  "Admin",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),
           ),
           ListTile(
-            onTap: () {
-              setState(() => _index = 0);
-              Get.back();
-            },
-            leading: Icon(Icons.dashboard),
+            leading: Icon(Icons.dashboard, color: Color(0xFF24476F)),
             title: Text('Dashboard'),
-            trailing: Icon(Icons.navigate_next),
-            iconColor: Colors.red,
-            textColor: Colors.red,
-          ),
-          ListTile(
             onTap: () {
-              setState(() => _index = 1);
+              setState(() {
+                _currentIndex = 0;
+                _tabController.animateTo(0);
+              });
               Get.back();
             },
-            leading: Icon(Icons.people),
+          ),
+          ListTile(
+            leading: Icon(Icons.people, color: Color(0xFF24476F)),
             title: Text('Data Mahasiswa'),
-            trailing: Icon(Icons.navigate_next),
-            iconColor: Colors.red,
-            textColor: Colors.red,
-          ),
-          ListTile(
             onTap: () {
-              setState(() => _index = 2);
+              setState(() {
+                _currentIndex = 1;
+                _tabController.animateTo(1);
+              });
               Get.back();
             },
-            leading: Icon(Icons.people),
+          ),
+          ListTile(
+            leading: Icon(Icons.school, color: Color(0xFF24476F)),
             title: Text('Data Dosen'),
-            trailing: Icon(Icons.navigate_next),
-            iconColor: Colors.red,
-            textColor: Colors.red,
-          ),
-          ListTile(
             onTap: () {
-              setState(() => _index = 3);
+              setState(() {
+                _currentIndex = 2;
+                _tabController.animateTo(2);
+              });
               Get.back();
             },
-            leading: Icon(Icons.people),
-            title: Text('Karyawan 22312022'),
-            trailing: Icon(Icons.navigate_next),
-            iconColor: Colors.red,
-            textColor: Colors.red,
           ),
           ListTile(
+            leading: Icon(Icons.work, color: Color(0xFF24476F)),
+            title: Text('Data Pegawai'),
             onTap: () {
+              setState(() {
+                _currentIndex = 3;
+                _tabController.animateTo(3);
+              });
               Get.back();
-              cAuth.logout();
             },
-            leading: Icon(Icons.logout),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.logout, color: Colors.red),
             title: Text('Logout'),
-            trailing: Icon(Icons.navigate_next),
-            iconColor: Colors.red,
-            textColor: Colors.red,
+            onTap: () {
+              cAuth.logout();
+              Get.back();
+            },
           ),
         ],
       ),

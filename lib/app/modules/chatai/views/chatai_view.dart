@@ -18,15 +18,18 @@ class ChataiView extends StatelessWidget {
             Expanded(
               child: ListView.builder(
                 itemCount: controller.isLoading.value
-                    ? controller.messages.length + 1 // Tambahkan pesan dummy saat mengetik
+                    ? controller.messages.length +
+                        1 // Tambahkan pesan dummy saat mengetik
                     : controller.messages.length,
                 itemBuilder: (context, index) {
                   // Cek apakah ini adalah pesan dummy (server sedang mengetik)
-                  if (index == controller.messages.length && controller.isLoading.value) {
+                  if (index == controller.messages.length &&
+                      controller.isLoading.value) {
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        margin:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
@@ -44,7 +47,8 @@ class ChataiView extends StatelessWidget {
                   final isUser = message['isUser'] ?? false;
 
                   return Align(
-                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       padding: EdgeInsets.all(10),
@@ -54,7 +58,8 @@ class ChataiView extends StatelessWidget {
                       ),
                       child: Text(
                         message['text'] ?? '',
-                        style: TextStyle(color: isUser ? Colors.white : Colors.black),
+                        style: TextStyle(
+                            color: isUser ? Colors.white : Colors.black),
                       ),
                     ),
                   );
@@ -66,24 +71,28 @@ class ChataiView extends StatelessWidget {
             if (controller.currentStep.value == 0) ...[
               // Step 0: Select Category
               Text("Pilih kategori:", style: TextStyle(fontSize: 16)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => controller.handleButtonPress("Mengatasi Masalah"),
-                    child: Text("Mengatasi Masalah"),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => controller.handleButtonPress("Motivasi"),
-                    child: Text("Motivasi"),
-                  ),
-                  SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () => controller.handleButtonPress("Kesehatan"),
-                    child: Text("Kesehatan"),
-                  ),
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () =>
+                          controller.handleButtonPress("Mengatasi Masalah"),
+                      child: Text("Mengatasi Masalah"),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () => controller.handleButtonPress("Motivasi"),
+                      child: Text("Motivasi"),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () =>
+                          controller.handleButtonPress("Kesehatan"),
+                      child: Text("Kesehatan"),
+                    ),
+                  ],
+                ),
               ),
             ] else if (controller.currentStep.value < 6) ...[
               // Other Steps: Input Field
@@ -98,16 +107,19 @@ class ChataiView extends StatelessWidget {
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: textEditingController, // Attach controller
+                          controller:
+                              textEditingController, // Attach controller
                           decoration: const InputDecoration(
                             hintText: 'Ketik jawaban Anda...',
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 12.0),
                           ),
                           onSubmitted: (value) {
                             if (value.isNotEmpty) {
                               controller.handleButtonPress(value);
-                              textEditingController.clear(); // Clear input field
+                              textEditingController
+                                  .clear(); // Clear input field
                             }
                           },
                         ),

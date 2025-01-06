@@ -55,7 +55,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CHATAI,
-      page: () => const ChataiView(),
+      page: () => ChataiView(),
       binding: ChataiBinding(),
     ),
   ];

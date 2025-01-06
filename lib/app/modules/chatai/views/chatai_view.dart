@@ -60,12 +60,9 @@ class ChataiView extends StatelessWidget {
                             color: isUser ? Colors.blue : Colors.grey[300],
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text(
+                          child: buildFormattedText(
                             message['text'] ?? '',
-                            style: TextStyle(
-                              color: isUser ? Colors.white : Colors.black87,
-                              fontSize: 14,
-                            ),
+                            isUser,
                           ),
                         ),
                       );
@@ -192,6 +189,47 @@ class ChataiView extends StatelessWidget {
           text,
           style: const TextStyle(fontSize: 14, color: Colors.white),
         ),
+      ),
+    );
+  }
+
+  // Fungsi untuk memformat teks
+  Widget buildFormattedText(String text, bool isUser) {
+    final boldRegex = RegExp(r'\*\*(.*?)\*\*'); // Pola untuk mencari **teks**
+
+    final spans = <TextSpan>[];
+    int start = 0;
+
+    // Temukan semua bagian yang sesuai pola
+    for (final match in boldRegex.allMatches(text)) {
+      if (match.start > start) {
+        spans.add(TextSpan(
+          text: text.substring(start, match.start),
+          style: TextStyle(color: isUser ? Colors.white : Colors.black),
+        ));
+      }
+      spans.add(TextSpan(
+        text: match.group(1), // Isi tanpa **
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: isUser ? Colors.white : Colors.black,
+        ),
+      ));
+      start = match.end;
+    }
+
+    // Tambahkan sisa teks setelah pencocokan terakhir
+    if (start < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(start),
+        style: TextStyle(color: isUser ? Colors.white : Colors.black),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(
+        children: spans,
+        style: TextStyle(color: isUser ? Colors.white : Colors.black),
       ),
     );
   }

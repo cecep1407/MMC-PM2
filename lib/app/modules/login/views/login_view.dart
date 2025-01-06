@@ -1,128 +1,168 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:myapp/app/controllers/auth_controller.dart';
 import 'package:myapp/app/routes/app_pages.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   final cAuth = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          Container(
-            height: 200,
-            color: Colors.red,
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: [
-                Image(
-                  image: NetworkImage(
-                    "https://1.bp.blogspot.com/-rGzybmEYVHM/XyMB2ITDpcI/AAAAAAAAC9k/MzGR0c6iF_ES8VgiLbuDa7r9jWVdoPWSQCLcBGAsYHQ/s1600/download%2BLOGO%2BUniversitas%2BTeknokrat%2BPNG.png",
-                  ),
-                  height: 80,
+      backgroundColor: Color(0xFFF8F9FA), // Background warna pastel abu-abu lembut
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              height: 240,
+              decoration: BoxDecoration(
+                color: Color(0xFFD4E7FE), // Warna pastel biru lembut
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
-                SizedBox(
-                  width: 5,
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Positioned(
-                      bottom: -10,
-                      child: Text(
-                        "UNIVERSITAS TEKNOKRAT",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/images/MMC_logo.png", // Logo MMC AI
+                        height: 80,
                       ),
-                    ),
-                    Text(
-                      "INDONESIA",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "ASEAN's Best Private University",
-                      style: TextStyle(
-                          color: Colors.yellow,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                )
-              ],
+                      SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "MMC AI",
+                            style: TextStyle(
+                              color: Color(0xFF24476F), // Biru tua pastel
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Solusi Cerdas Anda",
+                            style: TextStyle(
+                              color: Color(0xFF74B3CE), // Biru pastel lembut
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: controller.cEmail,
-                  decoration: InputDecoration(
-                      hintText: "Email",
+
+            // Login Form
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    "Selamat Datang",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF24476F), // Biru tua pastel
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    "Masuk untuk melanjutkan",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF748A9D), // Abu pastel lembut
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  TextFormField(
+                    controller: controller.cEmail,
+                    decoration: InputDecoration(
                       labelText: "Email",
+                      prefixIcon: Icon(Icons.email, color: Color(0xFF74B3CE)),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10))),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: controller.cPass,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                      hintText: "Password",
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true, // Latar belakang putih lembut
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: controller.cPass,
+                    obscureText: true,
+                    decoration: InputDecoration(
                       labelText: "Password",
+                      prefixIcon: Icon(Icons.lock, color: Color(0xFF74B3CE)),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10))),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: double.infinity, // Mengisi lebar secara penuh
-                  child: ElevatedButton(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
                     onPressed: () {
                       cAuth.login(
                           controller.cEmail.text, controller.cPass.text);
                     },
-                    child: Text("LOGIN"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white, // Warna teks di tombol
+                      backgroundColor: Color(0xFF74B3CE), // Biru pastel
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "LOGIN",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // Teks putih
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Get.toNamed(Routes
-                          .RESET_PASSWORD); // Menggunakan GetX untuk navigasi
-                    },
-                    child: Text("Lupa Password, Klik disini"),
+                  SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Get.toNamed(Routes.RESET_PASSWORD);
+                      },
+                      child: Text(
+                        "Lupa Password?",
+                        style: TextStyle(color: Color(0xFF24476F)), // Biru tua
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text("developed by MMC")
-              ],
+                  SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "Developed by MMC",
+                      style: TextStyle(
+                        color: Color(0xFF748A9D), // Abu pastel lembut
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

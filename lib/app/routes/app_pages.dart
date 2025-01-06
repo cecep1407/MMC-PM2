@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/chatai/bindings/chatai_binding.dart';
+import '../modules/chatai/views/chatai_view.dart';
 import '../modules/dosen/bindings/dosen_binding.dart';
 import '../modules/dosen/views/dosen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -50,6 +52,11 @@ class AppPages {
       name: _Paths.RESET_PASSWORD,
       page: () => ResetPasswordView(),
       binding: ResetPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.CHATAI,
+      page: () => ChataiView(),
+      binding: ChataiBinding(),
     ),
   ];
 }

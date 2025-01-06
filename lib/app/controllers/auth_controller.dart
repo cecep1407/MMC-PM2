@@ -7,7 +7,7 @@ import '../routes/app_pages.dart';
 class AuthController extends GetxController {
   //TODO: Implement AuthController
   FirebaseAuth auth = FirebaseAuth.instance;
-
+  
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
 
   void register(String name, String email, String password,

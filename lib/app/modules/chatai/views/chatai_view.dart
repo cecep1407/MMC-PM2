@@ -10,149 +10,189 @@ class ChataiView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chat AI")),
-      body: Obx(() {
-        return Column(
-          children: [
-            // Chat Messages Display
-            Expanded(
-              child: ListView.builder(
-                itemCount: controller.isLoading.value
-                    ? controller.messages.length +
-                        1 // Tambahkan pesan dummy saat mengetik
-                    : controller.messages.length,
-                itemBuilder: (context, index) {
-                  // Cek apakah ini adalah pesan dummy (server sedang mengetik)
-                  if (index == controller.messages.length &&
-                      controller.isLoading.value) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        margin:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
+      body: SafeArea(
+        child: Obx(() {
+          return Column(
+            children: [
+              // Chat Messages Display
+              Expanded(
+                child: Container(
+                  color: Colors.grey[100], // Light background for messages
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    itemCount: controller.isLoading.value
+                        ? controller.messages.length + 1 // Include loading
+                        : controller.messages.length,
+                    itemBuilder: (context, index) {
+                      // Show loading animation when typing
+                      if (index == controller.messages.length &&
+                          controller.isLoading.value) {
+                        return Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 15),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const SpinKitThreeBounce(
+                              color: Colors.grey,
+                              size: 20.0,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final message = controller.messages[index];
+                      final isUser = message['isUser'] ?? false;
+
+                      return Align(
+                        alignment:
+                            isUser ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 15),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: isUser ? Colors.blue : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            message['text'] ?? '',
+                            style: TextStyle(
+                              color: isUser ? Colors.white : Colors.black87,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-                        child: SpinKitThreeBounce(
-                          color: Colors.grey,
-                          size: 20.0,
-                        ),
-                      ),
-                    );
-                  }
-
-                  final message = controller.messages[index];
-                  final isUser = message['isUser'] ?? false;
-
-                  return Align(
-                    alignment:
-                        isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isUser ? Colors.blue : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        message['text'] ?? '',
-                        style: TextStyle(
-                            color: isUser ? Colors.white : Colors.black),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Step Logic
-            if (controller.currentStep.value == 0) ...[
-              // Step 0: Select Category
-              Text("Pilih kategori:", style: TextStyle(fontSize: 16)),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () =>
-                          controller.handleButtonPress("Mengatasi Masalah"),
-                      child: Text("Mengatasi Masalah"),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => controller.handleButtonPress("Motivasi"),
-                      child: Text("Motivasi"),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () =>
-                          controller.handleButtonPress("Kesehatan"),
-                      child: Text("Kesehatan"),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ] else if (controller.currentStep.value < 6) ...[
-              // Other Steps: Input Field
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
+
+              // Step Logic
+              if (controller.currentStep.value == 0) ...[
+                // Step 0: Select Category
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "Pilih kategori:",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
                   ),
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildCategoryButton("Mengatasi Masalah"),
+                      _buildCategoryButton("Motivasi"),
+                      _buildCategoryButton("Kesehatan"),
+                    ],
+                  ),
+                ),
+              ] else if (controller.currentStep.value < 6) ...[
+                // Other Steps: Input Field
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller:
-                              textEditingController, // Attach controller
-                          decoration: const InputDecoration(
-                            hintText: 'Ketik jawaban Anda...',
-                            border: InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          onSubmitted: (value) {
-                            if (value.isNotEmpty) {
-                              controller.handleButtonPress(value);
-                              textEditingController
-                                  .clear(); // Clear input field
-                            }
-                          },
+                          child: TextField(
+                            controller: textEditingController,
+                            decoration: const InputDecoration(
+                              hintText: 'Ketik jawaban Anda...',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            onSubmitted: (value) {
+                              if (value.isNotEmpty) {
+                                controller.handleButtonPress(value);
+                                textEditingController.clear();
+                              }
+                            },
+                          ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.send, color: Colors.orange),
-                        onPressed: () {
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
                           final value = textEditingController.text.trim();
                           if (value.isNotEmpty) {
                             controller.handleButtonPress(value);
-                            textEditingController.clear(); // Clear input field
+                            textEditingController.clear();
                           }
                         },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ] else ...[
-              // Restart Chat
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
+              ] else ...[
+                // Restart Chat
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: ElevatedButton(
                     onPressed: () => controller.restartChat(),
-                    child: Text("Mulai Ulang"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 12.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text("Mulai Ulang"),
                   ),
-                ],
-              ),
+                ),
+              ],
             ],
-          ],
-        );
-      }),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ElevatedButton(
+        onPressed: () => controller.handleButtonPress(text),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+          backgroundColor: Colors.blue[600],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 14, color: Colors.white),
+        ),
+      ),
     );
   }
 }

@@ -100,22 +100,83 @@ class AuthController extends GetxController {
     }
   }
 
+  // void login(String email, String password) async {
+  //   try {
+  //     final credential = await auth.signInWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+  //     Get.offAllNamed(Routes.HOME);
+  //   } on FirebaseAuthException catch (e) {
+  //     // Cetak nilai e.code ke konsol (untuk Debugging)
+  //     // print('Error Code: ${e.code}');
+  //     // print('Error Message: ${e.message}');
+  //     // // Tampilkan error melalui dialog(untuk debugging)
+  //     // Get.defaultDialog(
+  //     //   title: "Proses Gagal",
+  //     //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
+  //     // );
+      // if (e.code == 'invalid-email') {
+      //   print('No user found for that email.');
+      //   Get.defaultDialog(
+      //     title: "Login Gagal",
+      //     middleText: "Format Email Salah",
+      //   );
+      // } else if (e.code == 'invalid-credential') {
+      //   print('Wrong password provided for that user.');
+      //   Get.defaultDialog(
+      //     title: "Login Gagal",
+      //     middleText: "Password/Email salah",
+      //   );
+      // }
+  //   }
+  // }
+
+  // void logout() async {
+  //   await auth.signOut();
+  //   Get.offAllNamed(Routes.LOGIN);
+  // }
+
+  // State untuk menyimpan data user
+  var currentUserData = {}.obs;
+
+  // Fungsi untuk mengambil data user dari Firestore setelah login
+  Future<void> loadUserData(String uid) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (snapshot.exists) {
+        currentUserData.value = snapshot.data()!;
+      } else {
+        Get.defaultDialog(
+          title: "Error",
+          middleText: "Data user tidak ditemukan.",
+        );
+      }
+    } catch (e) {
+      Get.defaultDialog(
+        title: "Error",
+        middleText: "Gagal memuat data user.",
+      );
+    }
+  }
+   // Fungsi login dengan data user dimuat
   void login(String email, String password) async {
     try {
       final credential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Ambil data user dari Firestore berdasarkan UID
+      String uid = credential.user!.uid;
+      await loadUserData(uid);
+
+      // Navigasi ke halaman utama
       Get.offAllNamed(Routes.HOME);
     } on FirebaseAuthException catch (e) {
-      // Cetak nilai e.code ke konsol (untuk Debugging)
-      // print('Error Code: ${e.code}');
-      // print('Error Message: ${e.message}');
-      // // Tampilkan error melalui dialog(untuk debugging)
-      // Get.defaultDialog(
-      //   title: "Proses Gagal",
-      //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
-      // );
+      String message = "Login gagal.";
       if (e.code == 'invalid-email') {
         print('No user found for that email.');
         Get.defaultDialog(
@@ -132,10 +193,13 @@ class AuthController extends GetxController {
     }
   }
 
+  // Fungsi logout
   void logout() async {
     await auth.signOut();
+    currentUserData.clear(); // Bersihkan data user
     Get.offAllNamed(Routes.LOGIN);
   }
+
 
   void resetPassword(String email) async {
     try {

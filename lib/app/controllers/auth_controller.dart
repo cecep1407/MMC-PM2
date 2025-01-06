@@ -19,26 +19,26 @@ class AuthController extends GetxController {
       Get.offAllNamed(Routes.HOME);
     } on FirebaseAuthException catch (e) {
       // Cetak nilai e.code ke konsol (untuk Debugging)
-      print('Error Code: ${e.code}');
-      print('Error Message: ${e.message}');
-      // Tampilkan error melalui dialog(untuk debugging)
-      Get.defaultDialog(
-        title: "Proses Gagal",
-        middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
-      );
-      // if (e.code == 'invalid-email') {
-      //   print('No user found for that email.');
-      //   Get.defaultDialog(
-      //     title: "Login Gagal",
-      //     middleText: "User Tidak Ditemukan",
-      //   );
-      // } else if (e.code == 'invalid-credential') {
-      //   print('Wrong password provided for that user.');
-      //   Get.defaultDialog(
-      //     title: "Login Gagal",
-      //     middleText: "Password/Email salah",
-      //   );
-      // }
+      // print('Error Code: ${e.code}');
+      // print('Error Message: ${e.message}');
+      // // Tampilkan error melalui dialog(untuk debugging)
+      // Get.defaultDialog(
+      //   title: "Proses Gagal",
+      //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
+      // );
+      if (e.code == 'invalid-email') {
+        print('No user found for that email.');
+        Get.defaultDialog(
+          title: "Login Gagal",
+          middleText: "Format Email Salah",
+        );
+      } else if (e.code == 'invalid-credential') {
+        print('Wrong password provided for that user.');
+        Get.defaultDialog(
+          title: "Login Gagal",
+          middleText: "Password/Email salah",
+        );
+      }
     }
   }
 

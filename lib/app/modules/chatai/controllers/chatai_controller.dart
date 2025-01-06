@@ -3,103 +3,221 @@ import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChataiController extends GetxController {
-  // List untuk menyimpan pesan
   final messages = <Map<String, dynamic>>[].obs;
 
-  // TextEditingController untuk mengelola input teks
-  final textEditingController = TextEditingController();
+  // State Management
+  final isInputEnabled = true.obs;
+  final currentStep = 0.obs;
+  final selectedCategory = ''.obs;
+  var isLoading = false.obs; // Tambahkan ini
 
-  // Inisialisasi model
-  late final GenerativeModel model;
-
-  // Variabel untuk menyimpan data pengguna
+  // User Data
   final userData = {
-    'name': '',
-    'age': '',
+    'name': 'julius',
+    'age': '24',
     'education': '',
     'goal': '',
+    'healthIssues': '',
+    'height': '',
+    'keahlian': '',
+    'pengalaman': '',
+    'weight': '',
   }.obs;
 
-  // Variabel untuk melacak tahap pertanyaan
-  final currentStep = 0.obs;
+  // Google Generative AI
+  late final GenerativeModel model;
 
   final questions = [
-    'Halo! Siapa nama kamu?',
-    'Berapa umur kamu?',
-    'Apa pendidikan terakhir kamu?',
-    'Apa cita-cita kamu?'
+    "Pilih kategori: Mengatasi Masalah, Motivasi, atau Kesehatan",
+    "Apakah saran ini untuk Anda? (Ya/Tidak)",
   ];
 
   @override
   void onInit() {
     super.onInit();
-    // Inisialisasi model dengan API Key
+
+    // Initialize Google Generative AI
     model = GenerativeModel(
-      model: 'gemini-1.5-flash', // Sesuaikan dengan model yang ingin digunakan
-      apiKey: 'AIzaSyANXT8yWyVRXa99ypFSpN_nGBWqii2tGtw', // Ganti dengan API Key Anda
+      model: 'gemini-1.5-flash', // Sesuaikan model yang ingin digunakan
+      apiKey:
+          'AIzaSyANXT8yWyVRXa99ypFSpN_nGBWqii2tGtw', // Ganti dengan API Key Anda
     );
 
-    // Mulai dengan pertanyaan pertama
+    // Pertanyaan pertama
     messages.add({'text': questions[currentStep.value], 'isUser': false});
   }
 
   @override
   void onClose() {
-    textEditingController.dispose();
     super.onClose();
   }
 
-  // Fungsi untuk mengirim pesan
-  void sendMessage() async {
-    final userInput = textEditingController.text.trim();
-    if (userInput.isEmpty) return;
-
-    // Tambahkan pesan pengguna ke daftar pesan
+  void handleButtonPress(String userInput) {
+    // Tambahkan pesan pengguna berdasarkan tombol yang ditekan
     messages.add({'text': userInput, 'isUser': true});
-    textEditingController.clear();
 
-    // Simpan data berdasarkan tahapan
-    if (currentStep.value < questions.length) {
-      switch (currentStep.value) {
-        case 0:
-          userData['name'] = userInput;
-          break;
-        case 1:
-          userData['age'] = userInput;
-          break;
-        case 2:
-          userData['education'] = userInput;
-          break;
-        case 3:
-          userData['goal'] = userInput;
-          break;
-      }
-
-      // Pindah ke tahap berikutnya
+    if (currentStep.value == 0) {
+      selectedCategory.value = userInput;
       currentStep.value++;
+      if (selectedCategory.value.toLowerCase() == 'mengatasi masalah') {
+        // Tambahkan logika untuk menampilkan animasi loading
+        isLoading.value = true;
 
-      if (currentStep.value < questions.length) {
-        // Tampilkan pertanyaan berikutnya
-        messages.add({'text': questions[currentStep.value], 'isUser': false});
+        messages.add({
+          'text': "Jelaskan Masalah Apa yang sedang anda hadapi (Secara Rinci)",
+          'isUser': false
+        });
+        // Tambahkan logika untuk menampilkan animasi loading
+        isLoading.value = false;
+        currentStep.value = 5;
+      } else if (selectedCategory.value.toLowerCase() == 'motivasi') {
+        // Tambahkan logika untuk menampilkan animasi loading
+        isLoading.value = true;
+        messages.add(
+            {'text': "Cita-cita apa yang ingin anda capai?", 'isUser': false});
+        // Tambahkan logika untuk menampilkan animasi loading
+        isLoading.value = false;
+        currentStep.value = 2;
       } else {
-        // Jika semua pertanyaan selesai, panggil API Gemini untuk memberikan saran
-        final inputData = '''
-          Nama: ${userData['name']}
-          Umur: ${userData['age']}
-          Pendidikan: ${userData['education']}
-          Cita-cita: ${userData['goal']}
-        ''';
+        isLoading.value = true;
 
-        try {
-          final response = await model.generateContent([Content.text('Tulis Ulang Biodata tersebut dan berikan saran terbaik untuk meraih cita cita'+inputData)]);
-          final candidates = response.candidates;
-          final content = candidates.isNotEmpty ? candidates.first.text : 'Tidak ada respons dari AI';
-
-          messages.add({'text': content, 'isUser': false});
-        } catch (e) {
-          messages.add({'text': 'Terjadi kesalahan: $e', 'isUser': false});
-        }
+        messages.add({'text': "Berapa Tinggi badan anda?", 'isUser': false});
+        currentStep.value = 2;
+        // Tambahkan logika untuk menampilkan animasi loading
+        isLoading.value = false;
       }
+    } else {
+      processUserInput(userInput);
     }
+  }
+
+  // void collectUserDataForSelf() {
+  //   if(selectedCategory.value.toLowerCase() == 'mengatasi masalah'){
+  //     messages.add({'text': "Masalah Apa yang sedang anda hadapi?", 'isUser': false});
+  //   currentStep.value = 4;
+  //   }else if(selectedCategory.value.toLowerCase() == 'motivasi'){
+  //     messages.add({'text': "Cita-cita apa yang ingin anda capai?", 'isUser': false});
+  //   currentStep.value = 2;
+  //   } else{
+  //     messages.add({'text': "Cita-cita apa yang ingin anda capai?", 'isUser': false});
+  //     currentStep.value = 2;
+  //   }
+  // }
+
+  // void collectUserDataForOther() {
+  //   messages.add({'text': "Siapa nama orang tersebut?", 'isUser': false});
+  //   currentStep.value = 2;
+  // }
+
+  void processUserInput(String input) {
+    if (currentStep.value == 2) {
+      if (selectedCategory.value.toLowerCase() == 'motivasi') {
+        userData['goal'] = input;
+        isLoading.value = true;
+        messages
+            .add({'text': "Apa pendidikan terakhir Anda?", 'isUser': false});
+        isLoading.value = false;
+
+        currentStep.value = 3;
+      } else if (selectedCategory.value.toLowerCase() == 'kesehatan') {
+        userData['height'] = input;
+        isLoading.value = true;
+        messages.add({'text': "Berapa Berat badan Anda?", 'isUser': false});
+        isLoading.value = false;
+        currentStep.value = 3;
+      }
+    } else if (currentStep.value == 3) {
+      if (selectedCategory.value.toLowerCase() == 'motivasi') {
+        userData['education'] = input;
+        isLoading.value = true;
+        messages.add({'text': "Sebutkan keahlian/hobi anda!", 'isUser': false});
+        isLoading.value = false;
+        currentStep.value = 4;
+      } else if (selectedCategory.value.toLowerCase() == 'kesehatan') {
+        userData['weight'] = input;
+        isLoading.value = true;
+        messages.add({'text': "Masalah kesehatan apa yang Anda hadapi?",'isUser': false});
+        isLoading.value = false;
+        currentStep.value = 5;
+      }
+    } else if (currentStep.value == 4) {
+      if (selectedCategory.value.toLowerCase() == 'motivasi') {
+        userData['keahlian'] = input;
+        isLoading.value = true;
+        messages.add({'text': "Sebutkan pengalaman anda", 'isUser': false});
+        isLoading.value = false;
+        currentStep.value = 5;
+      }
+    } else if (currentStep.value == 5) {
+      if (selectedCategory.value.toLowerCase() == 'kesehatan') {
+        userData['healthIssues'] = input;
+      } else if (selectedCategory.value.toLowerCase() == 'motivasi') {
+        userData['pengalaman'] = input;
+      } else {
+        userData['goal'] = input;
+      }
+      isInputEnabled.value = false;
+      generateAdvice();
+      currentStep.value = 6;
+    }
+  }
+
+  void generateAdvice() async {
+    String inputData;
+    String prompt = '';
+
+    if (selectedCategory.value.toLowerCase() == 'mengatasi masalah') {
+      inputData = '''
+      Nama: ${userData['name']}
+      Umur: ${userData['age']}
+      Masalah: ${userData['goal']}
+      ''';
+      prompt =
+          "Berdasarkan data berikut, berikan solusi terbaik untuk masalah yang dihadapi:\n$inputData";
+    } else if (selectedCategory.value.toLowerCase() == 'motivasi') {
+      inputData = '''
+      Nama: ${userData['name']}
+      Umur: ${userData['age']}
+      Pendidikan: ${userData['education']}
+      Cita-cita: ${userData['goal']}
+      Keahlian: ${userData['keahlian']}
+      Pengalaman: ${userData['pengalaman']}
+      ''';
+      prompt =
+          "Berdasarkan data berikut, berikan saran terbaik untuk mencapai cita-cita:\n$inputData";
+    } else if (selectedCategory.value.toLowerCase() == 'kesehatan') {
+      inputData = '''
+      Nama: ${userData['name']}
+      Umur: ${userData['age']}
+      Tinggi: ${userData['height']}
+      Berat: ${userData['weight']}
+      Masalah Kesehatan: ${userData['healthIssues']}
+      ''';
+      prompt =
+          "Berdasarkan data berikut, berikan saran kesehatan terbaik:\n$inputData";
+    }
+
+    try {
+      isLoading.value = true;
+      final response = await model.generateContent([Content.text(prompt)]);
+      final candidates = response.candidates;
+      final content = candidates.isNotEmpty
+          ? candidates.first.text
+          : 'Tidak ada respons dari AI';
+
+      messages.add({'text': content, 'isUser': false});
+      isLoading.value = false;
+
+      // currentStep.value = 100;
+    } catch (e) {
+      messages.add({'text': 'Terjadi kesalahan: $e', 'isUser': false});
+    }
+  }
+
+  void restartChat() {
+    messages.clear();
+    currentStep.value = 0;
+    isInputEnabled.value = true;
+    messages.add({'text': questions[currentStep.value], 'isUser': false});
   }
 }

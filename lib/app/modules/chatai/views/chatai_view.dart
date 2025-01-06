@@ -1,118 +1,146 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-
 import '../controllers/chatai_controller.dart';
 
 class ChataiView extends StatelessWidget {
-  ChataiView({super.key});
-
   final ChataiController controller = Get.put(ChataiController());
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Obx(
-              () => ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                itemCount: controller.messages.length,
+      appBar: AppBar(title: Text("Chat AI")),
+      body: Obx(() {
+        return Column(
+          children: [
+            // Chat Messages Display
+            Expanded(
+              child: ListView.builder(
+                itemCount: controller.isLoading.value
+                    ? controller.messages.length + 1 // Tambahkan pesan dummy saat mengetik
+                    : controller.messages.length,
                 itemBuilder: (context, index) {
+                  // Cek apakah ini adalah pesan dummy (server sedang mengetik)
+                  if (index == controller.messages.length && controller.isLoading.value) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: SpinKitThreeBounce(
+                          color: Colors.grey,
+                          size: 20.0,
+                        ),
+                      ),
+                    );
+                  }
+
                   final message = controller.messages[index];
-                  final isUser = message['isUser'] as bool;
+                  final isUser = message['isUser'] ?? false;
+
                   return Align(
                     alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.all(12),
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: isUser ? Colors.orange : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(12),
+                        color: isUser ? Colors.blue : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child:  buildFormattedText(message['text'] as String, isUser),
+                      child: Text(
+                        message['text'] ?? '',
+                        style: TextStyle(color: isUser ? Colors.white : Colors.black),
+                      ),
                     ),
                   );
                 },
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 4,
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: controller.textEditingController,
-                    decoration: const InputDecoration(
-                      hintText: 'Type your message...',
-                      border: InputBorder.none,
-                    ),
-                    onSubmitted: (value) => controller.sendMessage(),
+
+            // Step Logic
+            if (controller.currentStep.value == 0) ...[
+              // Step 0: Select Category
+              Text("Pilih kategori:", style: TextStyle(fontSize: 16)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => controller.handleButtonPress("Mengatasi Masalah"),
+                    child: Text("Mengatasi Masalah"),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => controller.handleButtonPress("Motivasi"),
+                    child: Text("Motivasi"),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => controller.handleButtonPress("Kesehatan"),
+                    child: Text("Kesehatan"),
+                  ),
+                ],
+              ),
+            ] else if (controller.currentStep.value < 6) ...[
+              // Other Steps: Input Field
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: textEditingController, // Attach controller
+                          decoration: const InputDecoration(
+                            hintText: 'Ketik jawaban Anda...',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                          ),
+                          onSubmitted: (value) {
+                            if (value.isNotEmpty) {
+                              controller.handleButtonPress(value);
+                              textEditingController.clear(); // Clear input field
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.send, color: Colors.orange),
+                        onPressed: () {
+                          final value = textEditingController.text.trim();
+                          if (value.isNotEmpty) {
+                            controller.handleButtonPress(value);
+                            textEditingController.clear(); // Clear input field
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.orange),
-                  onPressed: controller.sendMessage,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+              ),
+            ] else ...[
+              // Restart Chat
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => controller.restartChat(),
+                    child: Text("Mulai Ulang"),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        );
+      }),
     );
   }
 }
-
-
- // Fungsi untuk memformat teks
-  Widget buildFormattedText(String text, bool isUser) {
-    final boldRegex = RegExp(r'\*\*(.*?)\*\*'); // Pola untuk mencari **teks**
-
-    final spans = <TextSpan>[];
-    int start = 0;
-
-    // Temukan semua bagian yang sesuai pola
-    for (final match in boldRegex.allMatches(text)) {
-      if (match.start > start) {
-        spans.add(TextSpan(
-          text: text.substring(start, match.start),
-          style: TextStyle(color: isUser ? Colors.white : Colors.black),
-        ));
-      }
-      spans.add(TextSpan(
-        text: match.group(1), // Isi tanpa **
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: isUser ? Colors.white : Colors.black,
-        ),
-      ));
-      start = match.end;
-    }
-
-    // Tambahkan sisa teks setelah pencocokan terakhir
-    if (start < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(start),
-        style: TextStyle(color: isUser ? Colors.white : Colors.black),
-      ));
-    }
-
-    return RichText(
-      text: TextSpan(
-        children: spans,
-        style: TextStyle(color: isUser ? Colors.white : Colors.black),
-      ),
-    );
-  }
-

@@ -9,13 +9,13 @@ import 'package:myapp/app/modules/pegawai/views/pegawai_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
-
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView>
     with SingleTickerProviderStateMixin {
+final authController = Get.find<AuthController>();
   final cAuth = Get.put(AuthController());
   late TabController _tabController;
   int _currentIndex = 0;
@@ -99,7 +99,7 @@ class _HomeViewState extends State<HomeView>
                 Icon(Icons.account_circle, size: 70, color: Colors.white),
                 SizedBox(height: 10),
                 Text(
-                  "Julius John Christian",
+                  "${authController.currentUserData['name']}",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

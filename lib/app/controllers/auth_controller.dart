@@ -39,5 +39,24 @@ class AuthController extends GetxController {
     Get.offAllNamed(Routes.LOGIN);
   }
 
-  void resetPassword() {}
+  void resetPassword(String email) async {
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    Get.defaultDialog(
+      title: "Reset Password",
+      middleText: "Cek email Anda untuk instruksi reset password.",
+    );
+  } on FirebaseAuthException catch (e) {
+    String message = 'Terjadi kesalahan, coba lagi.';
+    if (e.code == 'user-not-found') {
+      message = 'Pengguna dengan email tersebut tidak ditemukan.';
+    } else if (e.code == 'invalid-email') {
+      message = 'Email yang Anda masukkan tidak valid.';
+    }
+    Get.defaultDialog(
+      title: "Proses Gagal",
+      middleText: message,
+    );
+  }
+}
 }

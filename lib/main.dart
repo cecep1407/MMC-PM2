@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:myapp/firebase_options.dart';
 
 import 'app/routes/app_pages.dart';
+import 'package:change_app_package_name/change_app_package_name.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

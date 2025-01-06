@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:myapp/app/controllers/auth_controller.dart';
-
+import 'package:myapp/app/routes/app_pages.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -107,14 +108,17 @@ class LoginView extends GetView<LoginController> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed(Routes
+                          .RESET_PASSWORD); // Menggunakan GetX untuk navigasi
+                    },
                     child: Text("Lupa Password, Klik disini"),
                   ),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                Text("developed by nama(npm)")
+                Text("developed by MMC")
               ],
             ),
           ),

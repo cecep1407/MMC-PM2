@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../routes/app_pages.dart';
@@ -10,8 +11,13 @@ class AuthController extends GetxController {
 
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
 
-  void register(String name, String email, String password,
-      String confirmPassword) async {
+  void register(
+    String name,
+    String email,
+    DateTime birthDate,
+    String password,
+    String confirmPassword,
+  ) async {
     try {
       // Validasi jika ada kolom yang kosong
       if (name.isEmpty ||
@@ -42,13 +48,14 @@ class AuthController extends GetxController {
       );
 
       // Setelah registrasi sukses, Anda bisa menambahkan informasi tambahan ke Firestore
-      // seperti nama pengguna atau data profil lainnya.
+      // seperti nama pengguna, email, dan tanggal lahir.
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         // Pengguna sudah terautentikasi
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'name': name,
           'email': email,
+          'birthDate': birthDate.toIso8601String().split('T')[0], // Menyimpan tanggal lahir
         });
       } else {
         // Pengguna belum terautentikasi
@@ -59,9 +66,13 @@ class AuthController extends GetxController {
       }
 
       // Pendaftaran berhasil, navigasi ke halaman login atau home
-      Get.defaultDialog(
-        title: "Pendaftaran Sukses",
-        middleText: "Akun berhasil dibuat, silakan login.",
+      Get.snackbar(
+        "Pendaftaran Sukses",
+        "Akun berhasil dibuat, silakan login.",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
       );
 
       // Navigasi ke halaman login setelah pendaftaran berhasil

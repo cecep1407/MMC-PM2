@@ -112,6 +112,40 @@ class RegisterView extends GetView<RegisterController> {
                     ),
                   ),
                   SizedBox(height: 20),
+
+                  // Input Tanggal Lahir
+                  TextField(
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText: "Tanggal Lahir",
+                      prefixIcon:
+                          Icon(Icons.calendar_today, color: Color(0xFF74B3CE)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null) {
+                        controller.cDob.value = pickedDate; // Update Rx<DateTime>
+                      }
+                    },
+                    controller: TextEditingController(
+                      text: controller.cDob.value != null
+                          ? "${controller.cDob.value.toLocal()}".split(' ')[0]
+                          : '',
+                    ),
+                  ),
+                  SizedBox(height: 30),
+
                   TextFormField(
                     controller: controller.cPass,
                     obscureText: true,
@@ -131,7 +165,8 @@ class RegisterView extends GetView<RegisterController> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Konfirmasi Password",
-                      prefixIcon: Icon(Icons.lock_outline, color: Color(0xFF74B3CE)),
+                      prefixIcon:
+                          Icon(Icons.lock_outline, color: Color(0xFF74B3CE)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -145,6 +180,7 @@ class RegisterView extends GetView<RegisterController> {
                       cAuth.register(
                           controller.cName.text,
                           controller.cEmail.text,
+                          controller.cDob.value,
                           controller.cPass.text,
                           controller.cConfirmPass.text);
                     },
@@ -161,30 +197,6 @@ class RegisterView extends GetView<RegisterController> {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white, // Teks putih
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Get.toNamed(Routes.LOGIN); // Navigasi ke halaman login
-                      },
-                      child: Text(
-                        "Sudah punya akun?",
-                        style: TextStyle(color: Color(0xFF24476F)), // Biru tua
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      "Developed by MMC",
-                      style: TextStyle(
-                        color: Color(0xFF748A9D), // Abu pastel lembut
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ),

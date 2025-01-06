@@ -12,6 +12,8 @@ import '../modules/mahasiswa/bindings/mahasiswa_binding.dart';
 import '../modules/mahasiswa/views/mahasiswa_view.dart';
 import '../modules/pegawai/bindings/pegawai_binding.dart';
 import '../modules/pegawai/views/pegawai_view.dart';
+import '../modules/register/bindings/register_binding.dart';
+import '../modules/register/views/register_view.dart';
 import '../modules/reset_password/bindings/reset_password_binding.dart';
 import '../modules/reset_password/views/reset_password_view.dart';
 
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.CHATAI,
       page: () => ChataiView(),
       binding: ChataiBinding(),
+    ),
+    GetPage(
+      name: _Paths.REGISTER,
+      page: () => RegisterView(),
+      binding: RegisterBinding(),
     ),
   ];
 }

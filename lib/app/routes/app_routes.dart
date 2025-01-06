@@ -10,6 +10,7 @@ abstract class Routes {
   static const PEGAWAI = _Paths.PEGAWAI;
   static const RESET_PASSWORD = _Paths.RESET_PASSWORD;
   static const CHATAI = _Paths.CHATAI;
+  static const REGISTER = _Paths.REGISTER;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const PEGAWAI = '/pegawai';
   static const RESET_PASSWORD = '/reset-password';
   static const CHATAI = '/chatai';
+  static const REGISTER = '/register';
 }

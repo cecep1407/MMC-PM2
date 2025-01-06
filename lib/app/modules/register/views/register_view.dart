@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:myapp/app/controllers/auth_controller.dart';
 import 'package:myapp/app/routes/app_pages.dart';
-import '../controllers/login_controller.dart';
+import '../controllers/register_controller.dart';
 
-class LoginView extends GetView<LoginController> {
+class RegisterView extends GetView<RegisterController> {
   final cAuth = Get.put(AuthController());
 
   @override
@@ -63,14 +63,14 @@ class LoginView extends GetView<LoginController> {
               ),
             ),
 
-             // Login Form
+            // Register Form
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "Selamat Datang",
+                    "Daftar Akun Baru",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -79,13 +79,26 @@ class LoginView extends GetView<LoginController> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Masuk untuk melanjutkan",
+                    "Isi data berikut untuk membuat akun baru.",
                     style: TextStyle(
                       fontSize: 16,
                       color: Color(0xFF748A9D), // Abu pastel lembut
                     ),
                   ),
                   SizedBox(height: 30),
+                  TextFormField(
+                    controller: controller.cName,
+                    decoration: InputDecoration(
+                      labelText: "Nama",
+                      prefixIcon: Icon(Icons.person, color: Color(0xFF74B3CE)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: controller.cEmail,
                     decoration: InputDecoration(
@@ -112,11 +125,28 @@ class LoginView extends GetView<LoginController> {
                       filled: true,
                     ),
                   ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: controller.cConfirmPass,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Konfirmasi Password",
+                      prefixIcon: Icon(Icons.lock_outline, color: Color(0xFF74B3CE)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
+                  ),
                   SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () {
-                      cAuth.login(
-                          controller.cEmail.text, controller.cPass.text);
+                      cAuth.register(
+                          controller.cName.text,
+                          controller.cEmail.text,
+                          controller.cPass.text,
+                          controller.cConfirmPass.text);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF74B3CE), // Biru pastel
@@ -126,7 +156,7 @@ class LoginView extends GetView<LoginController> {
                       ),
                     ),
                     child: Text(
-                      "LOGIN",
+                      "REGISTER",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -139,37 +169,13 @@ class LoginView extends GetView<LoginController> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        Get.toNamed(Routes.RESET_PASSWORD);
+                        Get.toNamed(Routes.LOGIN); // Navigasi ke halaman login
                       },
                       child: Text(
-                        "Lupa Password?",
+                        "Sudah punya akun?",
                         style: TextStyle(color: Color(0xFF24476F)), // Biru tua
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Belum punya akun?",
-                        style: TextStyle(
-                          color: Color(0xFF748A9D), // Abu pastel lembut
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Get.toNamed(Routes.REGISTER); // Navigasi ke halaman register
-                        },
-                        child: Text(
-                          "Daftar Sekarang",
-                          style: TextStyle(
-                            color: Color(0xFF74B3CE), // Biru pastel lembut
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                   SizedBox(height: 20),
                   Center(

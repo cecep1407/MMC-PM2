@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -9,7 +10,85 @@ class AuthController extends GetxController {
 
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
 
-  void signup() {}
+  void register(String name, String email, String password,
+      String confirmPassword) async {
+    try {
+      // Validasi jika ada kolom yang kosong
+      if (name.isEmpty ||
+          email.isEmpty ||
+          password.isEmpty ||
+          confirmPassword.isEmpty) {
+        Get.defaultDialog(
+          title: "Pendaftaran Gagal",
+          middleText: "Semua kolom harus diisi.",
+        );
+        return;
+      }
+
+      // Validasi password dan konfirmasi password
+      if (password != confirmPassword) {
+        Get.defaultDialog(
+          title: "Pendaftaran Gagal",
+          middleText: "Password dan konfirmasi password tidak cocok.",
+        );
+        return;
+      }
+
+      // Proses registrasi menggunakan Firebase Auth
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Setelah registrasi sukses, Anda bisa menambahkan informasi tambahan ke Firestore
+      // seperti nama pengguna atau data profil lainnya.
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Pengguna sudah terautentikasi
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': name,
+          'email': email,
+        });
+      } else {
+        // Pengguna belum terautentikasi
+        Get.defaultDialog(
+          title: "Login Diperlukan",
+          middleText: "Anda harus login terlebih dahulu untuk melanjutkan.",
+        );
+      }
+
+      // Pendaftaran berhasil, navigasi ke halaman login atau home
+      Get.defaultDialog(
+        title: "Pendaftaran Sukses",
+        middleText: "Akun berhasil dibuat, silakan login.",
+      );
+
+      // Navigasi ke halaman login setelah pendaftaran berhasil
+      Get.offAllNamed(Routes.LOGIN);
+    } on FirebaseAuthException catch (e) {
+      // Tangani error yang mungkin terjadi selama registrasi
+      if (e.code == 'email-already-in-use') {
+        Get.defaultDialog(
+          title: "Pendaftaran Gagal",
+          middleText: "Email sudah digunakan, coba dengan email lain.",
+        );
+      } else if (e.code == 'weak-password') {
+        Get.defaultDialog(
+          title: "Pendaftaran Gagal",
+          middleText:
+              "Password terlalu lemah, gunakan password yang lebih kuat.",
+        );
+      } else {
+        // Menampilkan error secara umum
+        Get.defaultDialog(
+          title: "Pendaftaran Gagal",
+          middleText: "Terjadi kesalahan, coba lagi nanti.",
+        );
+      }
+    }
+  }
+
   void login(String email, String password) async {
     try {
       final credential = await auth.signInWithEmailAndPassword(

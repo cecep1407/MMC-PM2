@@ -15,7 +15,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView>
     with SingleTickerProviderStateMixin {
-final authController = Get.find<AuthController>();
+  final authController = Get.find<AuthController>();
   final cAuth = Get.put(AuthController());
   late TabController _tabController;
   int _currentIndex = 0;
@@ -41,6 +41,8 @@ final authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
+    print('AuthController Data du homeview: ${authController.currentUserData}');
+
     return Scaffold(
       drawer: _buildDrawer(),
       appBar: AppBar(
@@ -99,16 +101,16 @@ final authController = Get.find<AuthController>();
                 Icon(Icons.account_circle, size: 70, color: Colors.white),
                 SizedBox(height: 10),
                 Text(
+                  "Halo,",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+                Text(
                   "${authController.currentUserData['name']}",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
-                ),
-                Text(
-                  "Admin",
-                  style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),

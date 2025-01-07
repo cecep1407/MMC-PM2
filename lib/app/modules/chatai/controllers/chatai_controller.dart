@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:myapp/app/controllers/auth_controller.dart';
+import 'package:intl/intl.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChataiController extends GetxController {
@@ -9,12 +11,39 @@ class ChataiController extends GetxController {
   final isInputEnabled = true.obs;
   final currentStep = 0.obs;
   final selectedCategory = ''.obs;
+  final authController = Get.find<AuthController>();
+
   var isLoading = false.obs; // Tambahkan ini
+
+  String calculateAge(String dateOfBirthString) {
+  // Konversi String ke DateTime
+  DateTime dateOfBirth = DateTime.parse(dateOfBirthString);
+  DateTime today = DateTime.now();
+
+  // Hitung selisih tahun, bulan, dan hari
+  int years = today.year - dateOfBirth.year;
+  int months = today.month - dateOfBirth.month;
+  int days = today.day - dateOfBirth.day;
+
+  // Perbaiki jika bulan/hari negatif
+  if (days < 0) {
+    months--;
+    days += DateTime(today.year, today.month, 0).day; // Hari dalam bulan sebelumnya
+  }
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // Hasil dalam format umur
+  return "$years tahun $months bulan $days hari";
+}
+
 
   // User Data
   final userData = {
-    'name': 'julius',
-    'age': '24',
+    'name': '',
+    'age': '',
     'education': '',
     'goal': '',
     'healthIssues': '',
@@ -34,8 +63,24 @@ class ChataiController extends GetxController {
 
   @override
   void onInit() {
+    // Get.defaultDialog(
+    //     title: "Proses Gagal",
+    //     middleText: "AuthController Data: ${authController.currentUserData}",
+    //   );
     super.onInit();
-
+             // Pantau perubahan currentUserData di AuthController
+      // Sinkronisasi data saat onInit
+  if (authController.currentUserData.isNotEmpty) {
+    userData.value = {
+      'name': authController.currentUserData['name'],
+      'age': authController.currentUserData['birthDate'] != null
+          ? calculateAge(authController.currentUserData['birthDate'])
+          : 'Umur tidak ditemukan'
+    };
+    // debugging console
+    // print("Data user langsung sinkron di ChataiController: ${userData.value}");
+  }
+ 
     // Initialize Google Generative AI
     model = GenerativeModel(
       model: 'gemini-1.5-flash', // Sesuaikan model yang ingin digunakan
@@ -136,7 +181,10 @@ class ChataiController extends GetxController {
       } else if (selectedCategory.value.toLowerCase() == 'kesehatan') {
         userData['weight'] = input;
         isLoading.value = true;
-        messages.add({'text': "Masalah kesehatan apa yang Anda hadapi?",'isUser': false});
+        messages.add({
+          'text': "Masalah kesehatan apa yang Anda hadapi?",
+          'isUser': false
+        });
         isLoading.value = false;
         currentStep.value = 5;
       }
@@ -149,6 +197,14 @@ class ChataiController extends GetxController {
         currentStep.value = 5;
       }
     } else if (currentStep.value == 5) {
+      // userData['name'] = authController.currentUserData['name'] ?? '';
+      // if (authController.currentUserData['age'] != null) {
+      //    userData['age'] = calculateAge(authController.currentUserData['birthDate']);
+      // } else {
+      //   userData['age'] = ''; // Atau log error sesuai kebutuhan
+      // }
+      
+ 
       if (selectedCategory.value.toLowerCase() == 'kesehatan') {
         userData['healthIssues'] = input;
       } else if (selectedCategory.value.toLowerCase() == 'motivasi') {
@@ -199,6 +255,9 @@ class ChataiController extends GetxController {
 
     try {
       isLoading.value = true;
+    print('AuthController Data: ${authController.currentUserData}');
+    print('AuthController Instance: ${Get.find<AuthController>().hashCode}');
+
       final response = await model.generateContent([Content.text(prompt)]);
       final candidates = response.candidates;
       final content = candidates.isNotEmpty

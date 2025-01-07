@@ -5,11 +5,18 @@ import 'package:get/get.dart';
 
 import '../routes/app_pages.dart';
 
+ 
 class AuthController extends GetxController {
   //TODO: Implement AuthController
   FirebaseAuth auth = FirebaseAuth.instance;
+
   
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
+@override
+void onInit() {
+  super.onInit();
+  print("[AuthController] Initialized");
+}
 
   void register(
     String name,
@@ -112,10 +119,10 @@ class AuthController extends GetxController {
   //     // print('Error Code: ${e.code}');
   //     // print('Error Message: ${e.message}');
   //     // // Tampilkan error melalui dialog(untuk debugging)
-  //     // Get.defaultDialog(
-  //     //   title: "Proses Gagal",
-  //     //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
-  //     // );
+      // Get.defaultDialog(
+      //   title: "Proses Gagal",
+      //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
+      // );
       // if (e.code == 'invalid-email') {
       //   print('No user found for that email.');
       //   Get.defaultDialog(
@@ -171,6 +178,7 @@ class AuthController extends GetxController {
 
       // Ambil data user dari Firestore berdasarkan UID
       String uid = credential.user!.uid;
+      // print('uiddddddd: ${uid}');
       await loadUserData(uid);
 
       // Navigasi ke halaman utama

@@ -5,10 +5,12 @@ import 'package:myapp/app/routes/app_pages.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
-  final cAuth = Get.put(AuthController());
+  final cAuth =  Get.put(AuthController()); 
 
   @override
   Widget build(BuildContext context) {
+     final cEmail = TextEditingController();
+  final cPass = TextEditingController();
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FA), // Background warna pastel abu-abu lembut
       body: SingleChildScrollView(
@@ -87,7 +89,7 @@ class LoginView extends GetView<LoginController> {
                   ),
                   SizedBox(height: 30),
                   TextFormField(
-                    controller: controller.cEmail,
+                    controller: cEmail,
                     decoration: InputDecoration(
                       labelText: "Email",
                       prefixIcon: Icon(Icons.email, color: Color(0xFF74B3CE)),
@@ -100,7 +102,7 @@ class LoginView extends GetView<LoginController> {
                   ),
                   SizedBox(height: 20),
                   TextFormField(
-                    controller: controller.cPass,
+                    controller: cPass,
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Password",
@@ -116,7 +118,7 @@ class LoginView extends GetView<LoginController> {
                   ElevatedButton(
                     onPressed: () {
                       cAuth.login(
-                          controller.cEmail.text, controller.cPass.text);
+                          cEmail.text, cPass.text);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF74B3CE), // Biru pastel

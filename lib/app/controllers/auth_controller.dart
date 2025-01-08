@@ -5,18 +5,16 @@ import 'package:get/get.dart';
 
 import '../routes/app_pages.dart';
 
- 
 class AuthController extends GetxController {
   //TODO: Implement AuthController
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  
   Stream<User?> get streamAuthStatus => auth.authStateChanges();
-@override
-void onInit() {
-  super.onInit();
-  print("[AuthController] Initialized");
-}
+  @override
+  void onInit() {
+    super.onInit();
+    print("[AuthController] Initialized");
+  }
 
   void register(
     String name,
@@ -62,7 +60,9 @@ void onInit() {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'name': name,
           'email': email,
-          'birthDate': birthDate.toIso8601String().split('T')[0], // Menyimpan tanggal lahir
+          'birthDate': birthDate
+              .toIso8601String()
+              .split('T')[0], // Menyimpan tanggal lahir
         });
       } else {
         // Pengguna belum terautentikasi
@@ -82,7 +82,11 @@ void onInit() {
         duration: const Duration(seconds: 3),
       );
 
+      // Get.reset();
+      // Reinisialisasi AuthController jika menggunakan Get.reset()
+      // Get.put(AuthController());
       // Navigasi ke halaman login setelah pendaftaran berhasil
+      // Get.delete<AuthController>();
       Get.offAllNamed(Routes.LOGIN);
     } on FirebaseAuthException catch (e) {
       // Tangani error yang mungkin terjadi selama registrasi
@@ -119,23 +123,23 @@ void onInit() {
   //     // print('Error Code: ${e.code}');
   //     // print('Error Message: ${e.message}');
   //     // // Tampilkan error melalui dialog(untuk debugging)
-      // Get.defaultDialog(
-      //   title: "Proses Gagal",
-      //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
-      // );
-      // if (e.code == 'invalid-email') {
-      //   print('No user found for that email.');
-      //   Get.defaultDialog(
-      //     title: "Login Gagal",
-      //     middleText: "Format Email Salah",
-      //   );
-      // } else if (e.code == 'invalid-credential') {
-      //   print('Wrong password provided for that user.');
-      //   Get.defaultDialog(
-      //     title: "Login Gagal",
-      //     middleText: "Password/Email salah",
-      //   );
-      // }
+  // Get.defaultDialog(
+  //   title: "Proses Gagal",
+  //   middleText: "Error Code: ${e.code}\nMessage: ${e.message}",
+  // );
+  // if (e.code == 'invalid-email') {
+  //   print('No user found for that email.');
+  //   Get.defaultDialog(
+  //     title: "Login Gagal",
+  //     middleText: "Format Email Salah",
+  //   );
+  // } else if (e.code == 'invalid-credential') {
+  //   print('Wrong password provided for that user.');
+  //   Get.defaultDialog(
+  //     title: "Login Gagal",
+  //     middleText: "Password/Email salah",
+  //   );
+  // }
   //   }
   // }
 
@@ -168,7 +172,8 @@ void onInit() {
       );
     }
   }
-   // Fungsi login dengan data user dimuat
+
+  // Fungsi login dengan data user dimuat
   void login(String email, String password) async {
     try {
       final credential = await auth.signInWithEmailAndPassword(
@@ -207,7 +212,6 @@ void onInit() {
     currentUserData.clear(); // Bersihkan data user
     Get.offAllNamed(Routes.LOGIN);
   }
-
 
   void resetPassword(String email) async {
     try {

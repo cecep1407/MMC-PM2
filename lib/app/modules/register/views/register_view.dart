@@ -5,7 +5,8 @@ import 'package:myapp/app/routes/app_pages.dart';
 import '../controllers/register_controller.dart';
 
 class RegisterView extends GetView<RegisterController> {
-  final cAuth = Get.put(AuthController());
+  final cAuth =  Get.put(AuthController()); 
+
 
   @override
   Widget build(BuildContext context) {

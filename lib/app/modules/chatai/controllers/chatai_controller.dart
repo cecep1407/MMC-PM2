@@ -85,7 +85,7 @@ class ChataiController extends GetxController {
     model = GenerativeModel(
       model: 'gemini-1.5-flash', // Sesuaikan model yang ingin digunakan
       apiKey:
-          'AIzaSyANXT8yWyVRXa99ypFSpN_nGBWqii2tGtw', // Ganti dengan API Key Anda
+          'AIzaSyCXpsbErNoNZvGpZufEbXwWzyw9VDJJwcI', // Ganti dengan API Key Anda
     );
 
     // Pertanyaan pertama

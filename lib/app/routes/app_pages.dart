@@ -2,16 +2,10 @@ import 'package:get/get.dart';
 
 import '../modules/chatai/bindings/chatai_binding.dart';
 import '../modules/chatai/views/chatai_view.dart';
-import '../modules/dosen/bindings/dosen_binding.dart';
-import '../modules/dosen/views/dosen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
-import '../modules/mahasiswa/bindings/mahasiswa_binding.dart';
-import '../modules/mahasiswa/views/mahasiswa_view.dart';
-import '../modules/pegawai/bindings/pegawai_binding.dart';
-import '../modules/pegawai/views/pegawai_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/register/bindings/register_binding.dart';
@@ -38,21 +32,6 @@ class AppPages {
       binding: LoginBinding(),
     ),
     GetPage(
-      name: _Paths.MAHASISWA,
-      page: () => MahasiswaView(),
-      binding: MahasiswaBinding(),
-    ),
-    GetPage(
-      name: _Paths.DOSEN,
-      page: () => DosenView(),
-      binding: DosenBinding(),
-    ),
-    GetPage(
-      name: _Paths.PEGAWAI,
-      page: () => PegawaiView(),
-      binding: PegawaiBinding(),
-    ),
-    GetPage(
       name: _Paths.RESET_PASSWORD,
       page: () => ResetPasswordView(),
       binding: ResetPasswordBinding(),
@@ -69,7 +48,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PROFILE,
-      page: () => const ProfileView(),
+      page: () => ProfileView(),
       binding: ProfileBinding(),
     ),
   ];

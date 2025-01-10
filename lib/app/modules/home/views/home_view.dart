@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:myapp/app/controllers/auth_controller.dart';
 import 'package:myapp/app/modules/chatai/views/chatai_view.dart';
-import 'package:myapp/app/modules/dosen/views/dosen_add_view.dart';
-import 'package:myapp/app/modules/dosen/views/dosen_view.dart';
-import 'package:myapp/app/modules/mahasiswa/views/mahasiswa_view.dart';
-import 'package:myapp/app/modules/pegawai/views/pegawai_view.dart';
+import 'package:myapp/app/modules/profile/views/profile_view.dart';
+
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -22,9 +20,8 @@ class _HomeViewState extends State<HomeView>
 
   final List<Map<String, dynamic>> _tabs = [
     {'title': 'Dashboard', 'icon': Icons.dashboard, 'view': ChataiView()},
-    {'title': 'Mahasiswa', 'icon': Icons.people, 'view': MahasiswaView()},
-    {'title': 'Dosen', 'icon': Icons.school, 'view': DosenView()},
-    {'title': 'Pegawai', 'icon': Icons.work, 'view': PegawaiView()},
+     {'title': 'Profile', 'icon': Icons.people, 'view': ProfileView()},
+    
   ];
 
   @override
@@ -58,8 +55,8 @@ class _HomeViewState extends State<HomeView>
             icon: Icon(Icons.add_circle_outline),
             onPressed: () {
               // Menambahkan data sesuai tab aktif
-              if (_currentIndex == 2) Get.to(() => DosenAddView());
-              if (_currentIndex == 3) Get.to(() => PegawaiView());
+              if (_currentIndex == 2) Get.to(() => ProfileView());
+             
             },
           ),
         ],
@@ -126,39 +123,18 @@ class _HomeViewState extends State<HomeView>
               Get.back();
             },
           ),
-          ListTile(
+           ListTile(
             leading: Icon(Icons.people, color: Color(0xFF24476F)),
-            title: Text('Data Mahasiswa'),
+            title: Text('Profile'),
             onTap: () {
               setState(() {
-                _currentIndex = 1;
-                _tabController.animateTo(1);
+                _currentIndex = 0;
+                _tabController.animateTo(0);
               });
               Get.back();
             },
           ),
-          ListTile(
-            leading: Icon(Icons.school, color: Color(0xFF24476F)),
-            title: Text('Data Dosen'),
-            onTap: () {
-              setState(() {
-                _currentIndex = 2;
-                _tabController.animateTo(2);
-              });
-              Get.back();
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.work, color: Color(0xFF24476F)),
-            title: Text('Data Pegawai'),
-            onTap: () {
-              setState(() {
-                _currentIndex = 3;
-                _tabController.animateTo(3);
-              });
-              Get.back();
-            },
-          ),
+          
           Divider(),
           ListTile(
             leading: Icon(Icons.logout, color: Colors.red),
